@@ -10,9 +10,12 @@ app.use(express.static(viewStaticContents))
 app.use(express.static(cssContents))
 app.use(express.static(jsContents))
 
-
-
-
-app.listen(4000, ()=>{
+const server = app.listen(4000, ()=>{
     console.log("Server starts listening at Port 4000")
+})
+
+const upgradedServer = socket(server)
+
+upgradedServer.on('connection', (socket)=>{
+    console.log("Web socket connected", socket.id)
 })
