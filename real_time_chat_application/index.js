@@ -14,8 +14,12 @@ const server = app.listen(4000, ()=>{
     console.log("Server starts listening at Port 4000")
 })
 
-const upgradedServer = socket(server)
+const io = socket(server)
 
-upgradedServer.on('connection', (socket)=>{
+io.on('connection', (socket)=>{
     console.log("Web socket connected", socket.id)
+
+    socket.on('sendingMessage', (data)=>{
+        io.emit("broadcastMessage", data)
+    })
 })
