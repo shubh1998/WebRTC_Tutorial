@@ -2,7 +2,7 @@
 //        navigator.getUserMedia() is getting deprecated now it works on some browsers like chrome but not works in firefox
 //        To resolve this problem we need to use navigator.mediaDevices.getUserMedia(). You can search this on google to get more info about.
 
-const socket = io.connect("http://localhost:5000");
+const socket = io(); // This will work on all IPS connected through different networks
 const divVideoChatLobby = document.getElementById("video-chat-lobby");
 const divVideoChatRoom = document.getElementById("video-chat-room");
 const userVideo = document.getElementById("user-video");
