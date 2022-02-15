@@ -58,4 +58,10 @@ io.on('connection', (socket) => {
         // console.log(answer)
         socket.broadcast.to(roomName).emit("answer", answer)
     })
+
+    //logoc to leave room
+    socket.on("leave_room", (roomName)=>{
+        socket.leave(roomName)
+        socket.broadcast.to(roomName).emit("leave_room")
+    })
 })

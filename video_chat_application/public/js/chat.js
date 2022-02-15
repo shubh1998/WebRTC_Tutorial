@@ -158,26 +158,66 @@ socket.on("answer", (answer) => {
     rtcPeerConnection.setRemoteDescription(answer);
 })
 
-const controlAudio = ()=>{
+const controlAudio = () => {
     audioEnabled = !audioEnabled
-    if(audioEnabled){
+    if (audioEnabled) {
         userStream.getTracks()[0].enabled = false
         audioButton.textContent = "Unmute"
-    }else{
+    } else {
         userStream.getTracks()[0].enabled = true
         audioButton.textContent = "Mute"
     }
 }
 
-const controlCamera = ()=>{
+const controlCamera = () => {
     cameraEnabled = !cameraEnabled
-    if(cameraEnabled){
+    if (cameraEnabled) {
         userStream.getTracks()[1].enabled = false
         cameraButton.textContent = "Show Camera"
-    }else{
+    } else {
         userStream.getTracks()[1].enabled = true
         cameraButton.textContent = "Hide Camera"
     }
 }
 
-const leaveRoom = ()=>{}
+const leaveRoom = () => {
+    socket.emit("leave_room", roomName)
+
+    // Updated UI changes according to leave room
+    divVideoChatLobby.style = "display: block";
+    userVideo.style = "border: none";
+    peerVideo.style = "border: none";
+    divButtonGroup.style = "display: none";
+
+    // Stop the tracks when somebody leaves the room
+    if (userVideo.srcObject) {
+        userVideo.srcObject.getTracks().forEach(track => track.stop())
+    }
+    if (peerVideo.srcObject) {
+        peerVideo.srcObject.getTracks().forEach(track => track.stop())
+    }
+
+    // Safely Disconnect RTCPeerConnection from Peer 
+    if(rtcPeerConnection){
+        rtcPeerConnection.ontrack = null;
+        rtcPeerConnection.onicecandidate = null;
+        rtcPeerConnection.close();
+        rtcPeerConnection = null
+    }
+}
+
+// Listens leave_room and safely redirect changes on UI by disconnecting peer 
+socket.on("leave_room", () => {
+    roomCreator = true // This person is now the creator of room because he/she only in the room now.
+
+    if(rtcPeerConnection){
+        rtcPeerConnection.ontrack = null;
+        rtcPeerConnection.onicecandidate = null;
+        rtcPeerConnection.close();
+        rtcPeerConnection = null
+    } 
+
+    if (peerVideo.srcObject) {
+        peerVideo.srcObject.getTracks().forEach(track => track.stop()) // stops receiving tracks of audio and video
+    }
+})
