@@ -43,19 +43,19 @@ io.on('connection', (socket) => {
 
     // logic to exchnage ICE candidates to establish connection
     socket.on("candidate", (candidate, roomName) => {
-        console.log(candidate)
+        // console.log(candidate)
         socket.broadcast.to(roomName).emit("candidate", candidate)
     })
 
     // logic to make an offer 
     socket.on("offer", (offer, roomName) => {
-        console.log(offer)
+        // console.log(offer)
         socket.broadcast.to(roomName).emit("offer", offer)
     })
 
     // logic to make an answer
     socket.on("answer", (answer, roomName) => {
-        console.log(answer)
+        // console.log(answer)
         socket.broadcast.to(roomName).emit("answer", answer)
     })
 })

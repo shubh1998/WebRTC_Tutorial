@@ -22,6 +22,20 @@ let iceServers = {
     ],
 }
 
+
+const onIceCandidateFunction = (event) => {
+    if (event.candidate) {
+        socket.emit("candidate", event.candidate, roomName)
+    }
+}
+
+const OnTrackFunction = (event) => {
+    peerVideo.srcObject = event.streams[0];
+    peerVideo.onloadedmetadata = (e) => {
+        peerVideo.play()
+    }
+}
+
 // capture user media streams
 const getUserMediaStream = () => {
     const constraints = {
@@ -87,7 +101,7 @@ socket.on("room_ready_to_join", () => {
         // Runs onicecandidate everytime when it gets candidate from STUN server
         rtcPeerConnection.onicecandidate = onIceCandidateFunction
         // OnTrack Function gets triggered when we start to get media stream from peer to which we are trying to connect.
-        rtcPeerConnection.ontrack = OnTrackFunction
+        rtcPeerConnection.ontrack = OnTrackFunction;
         //To send out media stream to other peer side
         console.log(userStream.getTracks())
         rtcPeerConnection.addTrack(userStream.getTracks()[0], userStream) // 0 represent audio track
@@ -103,13 +117,16 @@ socket.on("room_ready_to_join", () => {
 })
 
 // Listening candidate event to exchange ICE Candidates
-socket.on("candidate", () => { })
+socket.on("candidate", (candidate) => {
+    let icecandidate = new RTCIceCandidate(candidate);
+    rtcPeerConnection.addIceCandidate(icecandidate);
+})
 
 // Listening offer event to create and set offer
 socket.on("offer", (offer) => {
     if (!roomCreator) {
         rtcPeerConnection = new RTCPeerConnection(iceServers);
-        rtcPeerConnection.onicecandidate = OnIceCandidateFunction;
+        rtcPeerConnection.onicecandidate = onIceCandidateFunction;
         rtcPeerConnection.ontrack = OnTrackFunction;
         rtcPeerConnection.addTrack(userStream.getTracks()[0], userStream);
         rtcPeerConnection.addTrack(userStream.getTracks()[1], userStream);
@@ -130,17 +147,3 @@ socket.on("offer", (offer) => {
 socket.on("answer", (answer) => {
     rtcPeerConnection.setRemoteDescription(answer);
 })
-
-
-const onIceCandidateFunction = (event) => {
-    if (event.candidate) {
-        socket.emit("candidate", event.candidate, roomName)
-    }
-}
-
-const OnTrackFunction = (event) => {
-    peerVideo.srcObject = event.stream[0];
-    peerVideo.onloadedmetadata = (e) => {
-        peerVideo.play()
-    }
-}
