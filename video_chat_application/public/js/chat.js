@@ -5,6 +5,7 @@ const userVideo = document.getElementById("user-video");
 const peerVideo = document.getElementById("peer-video");
 const roomInput = document.getElementById("roomName");
 
+// capture user media streams
 const getUserMediaStream = async () => {
     const constraints = {
         audio: true,
@@ -24,6 +25,7 @@ const getUserMediaStream = async () => {
     navigator.getUserMedia(constraints, successsCallback, errorCallback)
 }
 
+// Join room function triggers when user clicks join room button
 const joinRoom = () => {
     if (roomInput.value === "") {
         alert("Please enter the room name !")
@@ -35,4 +37,3 @@ const joinRoom = () => {
         getUserMediaStream()
     }
 }
-
