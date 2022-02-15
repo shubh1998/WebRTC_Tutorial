@@ -19,4 +19,20 @@ const io = socket(server)
 
 io.on('connection', (socket)=>{
     console.log("Web socket connected", socket.id)
+
+    socket.on('join_room', (roomName)=>{
+        const rooms = io.sockets.adapter.rooms;
+        const roomAlreadyExist = rooms.get(roomName)
+
+        if(roomAlreadyExist === undefined){
+            socket.join(roomName)
+            console.log("Room created successfully !")
+        } else if(roomAlreadyExist.size === 1){
+            socket.join(roomName)
+            console.log("Room Joined By user successfully !")
+        } else{
+            console.log("Room can not be join by user. Room is full for now !")
+        }
+        console.log(rooms)
+    })
 })
