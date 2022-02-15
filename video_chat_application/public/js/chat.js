@@ -8,11 +8,17 @@ const divVideoChatRoom = document.getElementById("video-chat-room");
 const userVideo = document.getElementById("user-video");
 const peerVideo = document.getElementById("peer-video");
 const roomInput = document.getElementById("roomName");
+const divButtonGroup = document.getElementById("btn-group");
+const audioButton = document.getElementById("audioButton");
+const cameraButton = document.getElementById("cameraButton");
+const leaveButton = document.getElementById("leaveButton");
 
 let roomCreator = false
 let rtcPeerConnection = null
 let userStream = null
 let roomName = null
+let audioEnabled = false
+let cameraEnabled = false
 
 // Contains the stun server URL we will be using.
 let iceServers = {
@@ -40,7 +46,7 @@ const OnTrackFunction = (event) => {
 const getUserMediaStream = () => {
     const constraints = {
         audio: true,
-        video: { width: 1280, height: 720 }
+        video: { width: 720, height: 480 }
     }
 
     navigator.mediaDevices
@@ -49,6 +55,10 @@ const getUserMediaStream = () => {
             /* use the stream */
             userStream = stream;
             divVideoChatLobby.style = "display:none";
+            userVideo.style = "border: 1px solid white;";
+            peerVideo.style = "border: 1px solid white;";
+            divButtonGroup.style = "display:flex";
+
             userVideo.srcObject = stream;
             userVideo.onloadedmetadata = function (e) {
                 userVideo.play();
@@ -147,3 +157,27 @@ socket.on("offer", (offer) => {
 socket.on("answer", (answer) => {
     rtcPeerConnection.setRemoteDescription(answer);
 })
+
+const controlAudio = ()=>{
+    audioEnabled = !audioEnabled
+    if(audioEnabled){
+        userStream.getTracks()[0].enabled = false
+        audioButton.textContent = "Unmute"
+    }else{
+        userStream.getTracks()[0].enabled = true
+        audioButton.textContent = "Mute"
+    }
+}
+
+const controlCamera = ()=>{
+    cameraEnabled = !cameraEnabled
+    if(cameraEnabled){
+        userStream.getTracks()[1].enabled = false
+        cameraButton.textContent = "Show Camera"
+    }else{
+        userStream.getTracks()[1].enabled = true
+        cameraButton.textContent = "Hide Camera"
+    }
+}
+
+const leaveRoom = ()=>{}
