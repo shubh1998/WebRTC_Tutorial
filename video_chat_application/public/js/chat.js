@@ -10,48 +10,54 @@ const peerVideo = document.getElementById("peer-video");
 const roomInput = document.getElementById("roomName");
 
 let roomCreator = false
-const rtcPeerConnection = null
-const IceServers = {
-    iceServers: [
-        { url: "stun:stun.services.mozilla.com" },
-        { url: "stun1.l.google.com:19302" }
-    ]
-}
+let rtcPeerConnection = null
 let userStream = null
+let roomName = null
+
+// Contains the stun server URL we will be using.
+let iceServers = {
+    iceServers: [
+        { urls: "stun:stun.services.mozilla.com" },
+        { urls: "stun:stun.l.google.com:19302" },
+    ],
+}
 
 // capture user media streams
-const getUserMediaStream = async () => {
-    let stream = null;
+const getUserMediaStream = () => {
     const constraints = {
         audio: true,
         video: { width: 1280, height: 720 }
     }
 
-    try {
-        stream = await navigator.mediaDevices.getUserMedia(constraints);
-        /* use the stream */
-        userStream = stream
-        divVideoChatLobby.style.display = "none"
-        userVideo.srcObject = stream;
-        userVideo.onloadedmetadata = (e) => {
-            userVideo.play();
-        }
-    } catch (error) {
-        /* handle the error */
-        alert("Could not access user media !")
-        console.log(error)
-    }
+    navigator.mediaDevices
+        .getUserMedia(constraints)
+        .then((stream)=>{
+            /* use the stream */
+            userStream = stream;
+            divVideoChatLobby.style = "display:none";
+            userVideo.srcObject = stream;
+            userVideo.onloadedmetadata = function (e) {
+                userVideo.play();
+            };
+            if(!roomCreator){
+                socket.emit("room_ready_to_join", roomName);  
+            }
+        })
+        .catch((err)=>{
+            /* handle the error */
+            alert("Couldn't Access User Media");
+        });
 }
 
 // Join room function triggers when user clicks join room button
 const joinRoom = () => {
     if (roomInput.value === "") {
         alert("Please enter the room name !")
-        return
     }
     else {
         //emit event to join a room
-        socket.emit('join_room', roomInput.value)
+        roomName = roomInput.value;
+        socket.emit('join_room', roomName)
     }
 }
 
@@ -63,28 +69,36 @@ socket.on("room_created", () => {
 
 // Listening room joined event
 socket.on("room_joined", () => {
+    roomCreator = false
     getUserMediaStream()
 })
 
 // Listening room full event
 socket.on("room_full", () => {
     alert("Sorry, Room is full, you can't join right now. Please try to join after some time !");
-    return
 })
 
 // Listening room_ready_to_join event
-socket.on("room_ready_to_join", () => { 
-    if(roomCreator){
+socket.on("room_ready_to_join", () => {
+    if (roomCreator) {
         //Establishing peer connection using ICE Servers
-        rtcPeerConnection = new RTCPeerConnection(IceServers)
+        rtcPeerConnection = new RTCPeerConnection(iceServers)
         // Exchanging candidates by assigning function onIceCandidateFunction in rtcPeerConnection.onicecandidate interface
         // Runs onicecandidate everytime when it gets candidate from STUN server
         rtcPeerConnection.onicecandidate = onIceCandidateFunction
         // OnTrack Function gets triggered when we start to get media stream from peer to which we are trying to connect.
         rtcPeerConnection.ontrack = OnTrackFunction
         //To send out media stream to other peer side
+        console.log(userStream.getTracks())
         rtcPeerConnection.addTrack(userStream.getTracks()[0], userStream) // 0 represent audio track
         rtcPeerConnection.addTrack(userStream.getTracks()[1], userStream) // 1 represent video track
+        // Now we need to create Offer (Offer contains info about session, transcoding and type of stream)
+        rtcPeerConnection.createOffer().then((offer) => {
+            rtcPeerConnection.setLocalDescription(offer);
+            socket.emit("offer", offer, roomName);
+        }).catch((error) => {
+            console.log(error);
+        });
     }
 })
 
@@ -98,15 +112,15 @@ socket.on("offer", () => { })
 socket.on("answer", () => { })
 
 
-const onIceCandidateFunction = (event)=>{
-    if(event.candidate){
-        socket.emit("candidate", event.candidate, roomInput.value)
+const onIceCandidateFunction = (event) => {
+    if (event.candidate) {
+        socket.emit("candidate", event.candidate, roomName)
     }
 }
 
-const OnTrackFunction = (event)=>{
+const OnTrackFunction = (event) => {
     peerVideo.srcObject = event.stream[0];
-    peerVideo.onloadedmetadata = (e)=>{
+    peerVideo.onloadedmetadata = (e) => {
         peerVideo.play()
     }
 }

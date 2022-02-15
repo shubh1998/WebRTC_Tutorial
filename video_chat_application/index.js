@@ -38,25 +38,24 @@ io.on('connection', (socket) => {
 
     // logic to inform room creator someone joins your room
     socket.on("room_ready_to_join", (roomName) => {
-        console.log("room_ready_to_join")
         socket.broadcast.to(roomName).emit("room_ready_to_join")
     })
 
     // logic to exchnage ICE candidates to establish connection
-    socket.on("candidate", (ICECandidate, roomName) => {
-        console.log("Candidate")
-        socket.broadcast.to(roomName).emit("candidate", ICECandidate)
+    socket.on("candidate", (candidate, roomName) => {
+        console.log(candidate)
+        socket.broadcast.to(roomName).emit("candidate", candidate)
     })
 
     // logic to make an offer 
     socket.on("offer", (offer, roomName) => {
-        console.log("Offers")
+        console.log(offer)
         socket.broadcast.to(roomName).emit("offer", offer)
     })
 
     // logic to make an answer
     socket.on("answer", (answer, roomName) => {
-        console.log("Answers")
-        socket.broadcast.to(roomName).emit("candidate", answer)
+        console.log(answer)
+        socket.broadcast.to(roomName).emit("answer", answer)
     })
 })
