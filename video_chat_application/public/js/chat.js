@@ -17,6 +17,7 @@ const IceServers = {
         { url: "stun1.l.google.com:19302" }
     ]
 }
+let userStream = null
 
 // capture user media streams
 const getUserMediaStream = async () => {
@@ -29,6 +30,7 @@ const getUserMediaStream = async () => {
     try {
         stream = await navigator.mediaDevices.getUserMedia(constraints);
         /* use the stream */
+        userStream = stream
         divVideoChatLobby.style.display = "none"
         userVideo.srcObject = stream;
         userVideo.onloadedmetadata = (e) => {
@@ -80,6 +82,9 @@ socket.on("room_ready_to_join", () => {
         rtcPeerConnection.onicecandidate = onIceCandidateFunction
         // OnTrack Function gets triggered when we start to get media stream from peer to which we are trying to connect.
         rtcPeerConnection.ontrack = OnTrackFunction
+        //To send out media stream to other peer side
+        rtcPeerConnection.addTrack(userStream.getTracks()[0], userStream) // 0 represent audio track
+        rtcPeerConnection.addTrack(userStream.getTracks()[1], userStream) // 1 represent video track
     }
 })
 
