@@ -78,6 +78,8 @@ socket.on("room_ready_to_join", () => {
         // Exchanging candidates by assigning function onIceCandidateFunction in rtcPeerConnection.onicecandidate interface
         // Runs onicecandidate everytime when it gets candidate from STUN server
         rtcPeerConnection.onicecandidate = onIceCandidateFunction
+        // OnTrack Function gets triggered when we start to get media stream from peer to which we are trying to connect.
+        rtcPeerConnection.ontrack = OnTrackFunction
     }
 })
 
@@ -94,5 +96,12 @@ socket.on("answer", () => { })
 const onIceCandidateFunction = (event)=>{
     if(event.candidate){
         socket.emit("candidate", event.candidate, roomInput.value)
+    }
+}
+
+const OnTrackFunction = (event)=>{
+    peerVideo.srcObject = event.stream[0];
+    peerVideo.onloadedmetadata = (e)=>{
+        peerVideo.play()
     }
 }
