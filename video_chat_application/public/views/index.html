@@ -11,7 +11,7 @@
         <div id="video-chat-lobby">
             <h2 class="text">Video Chat Application</h2>
             <input id="roomName" type="text" placeholder="Room Name" />
-            <button id="join">Join</button>
+            <button id="join" onclick="joinRoom()">Join</button>
         </div>
         <div id="video-chat-room">
             <video id="user-video"></video>
@@ -19,6 +19,6 @@
         </div>
 
     </body>
-    <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
     <script src="/chat.js"></script>
 </html>
