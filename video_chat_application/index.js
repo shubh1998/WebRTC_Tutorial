@@ -36,10 +36,10 @@ io.on('connection', (socket) => {
         }
     })
 
-    // logic to inform broadcaster someone joins your room
-    socket.on("someone_join_the_room", (roomName) => {
-        console.log("someone_join_the_room")
-        socket.broadcast.to(roomName).emit("someone_join_the_room")
+    // logic to inform room creator someone joins your room
+    socket.on("room_ready_to_join", (roomName) => {
+        console.log("room_ready_to_join")
+        socket.broadcast.to(roomName).emit("room_ready_to_join")
     })
 
     // logic to exchnage ICE candidates to establish connection
