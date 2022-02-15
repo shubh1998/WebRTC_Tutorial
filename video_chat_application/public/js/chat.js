@@ -31,7 +31,7 @@ const getUserMediaStream = () => {
 
     navigator.mediaDevices
         .getUserMedia(constraints)
-        .then((stream)=>{
+        .then((stream) => {
             /* use the stream */
             userStream = stream;
             divVideoChatLobby.style = "display:none";
@@ -39,11 +39,11 @@ const getUserMediaStream = () => {
             userVideo.onloadedmetadata = function (e) {
                 userVideo.play();
             };
-            if(!roomCreator){
-                socket.emit("room_ready_to_join", roomName);  
+            if (!roomCreator) {
+                socket.emit("room_ready_to_join", roomName);
             }
         })
-        .catch((err)=>{
+        .catch((err) => {
             /* handle the error */
             alert("Couldn't Access User Media");
         });
@@ -106,10 +106,30 @@ socket.on("room_ready_to_join", () => {
 socket.on("candidate", () => { })
 
 // Listening offer event to create and set offer
-socket.on("offer", () => { })
+socket.on("offer", (offer) => {
+    if (!roomCreator) {
+        rtcPeerConnection = new RTCPeerConnection(iceServers);
+        rtcPeerConnection.onicecandidate = OnIceCandidateFunction;
+        rtcPeerConnection.ontrack = OnTrackFunction;
+        rtcPeerConnection.addTrack(userStream.getTracks()[0], userStream);
+        rtcPeerConnection.addTrack(userStream.getTracks()[1], userStream);
+        rtcPeerConnection.setRemoteDescription(offer);
+        rtcPeerConnection
+            .createAnswer()
+            .then((answer) => {
+                rtcPeerConnection.setLocalDescription(answer);
+                socket.emit("answer", answer, roomName);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+})
 
 // Listening answer event to create and set answer
-socket.on("answer", () => { })
+socket.on("answer", (answer) => {
+    rtcPeerConnection.setRemoteDescription(answer);
+})
 
 
 const onIceCandidateFunction = (event) => {
