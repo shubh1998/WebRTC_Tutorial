@@ -1,0 +1,77 @@
+{
+  "name": "user-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/styled": "11.6.0",
+    "@mui/icons-material": "^5.3.0",
+    "@mui/material": "5.2.4",
+    "@reduxjs/toolkit": "1.7.1",
+    "@testing-library/jest-dom": "5.16.1",
+    "@testing-library/react": "12.1.2",
+    "@testing-library/user-event": "13.5.0",
+    "axios": "0.24.0",
+    "lodash": "4.17.21",
+    "number-precision": "1.5.1",
+    "react": "17.0.2",
+    "react-custom-roulette": "^1.1.8",
+    "react-dom": "17.0.2",
+    "react-flv-player": "^1.0.9",
+    "react-hls-player": "^3.0.7",
+    "react-redux": "7.2.6",
+    "react-router-dom": "6.1.1",
+    "react-scripts": "4.0.3",
+    "socket.io-client": "4.4.0",
+    "universal-cookie": "4.0.4",
+    "web-vitals": "2.1.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "prestart": "node scripts/restrictNodeVersion",
+    "preinstall": "node scripts/restrictNodeVersion",
+    "test": "CI=true react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "standard",
+    "lint:fix": "standard --fix"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-react"
+    ]
+  },
+  "standard": {
+    "parser": "@babel/eslint-parser",
+    "env": {
+      "jest": true,
+      "browser": true
+    },
+    "globals": [
+      "artifacts",
+      "tronWeb",
+      "contract",
+      "before",
+      "assert",
+      "after"
+    ]
+  },
+  "devDependencies": {
+    "@babel/cli": "7.16.0",
+    "@babel/core": "7.16.5",
+    "@babel/eslint-parser": "7.16.5",
+    "@babel/preset-react": "7.16.5",
+    "standard": "16.0.4"
+  }
+}
